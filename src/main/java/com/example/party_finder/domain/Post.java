@@ -36,7 +36,6 @@ public class Post {
     @Column(nullable = false)
     private String password; // 수정 및 삭제를 위한 비밀번호
 
-\
     // --- 프론트엔드 연동을 위해 추가된 필드들 ---
     @Column(nullable = false)
     private String category; // "게임" 또는 "공부"

@@ -1,24 +1,48 @@
 package com.example.party_finder.dto;
 
+import com.example.party_finder.domain.Post;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.NoArgsConstructor;
+import java.time.format.DateTimeFormatter;
 
 @Getter
-@Setter // 1. 데이터를 쉽게 넣고 뺄 수 있게 롬복(Lombok) 도구를 쓴다.
+@Setter
+@NoArgsConstructor // 빈 생성자를 자동으로 만들어줍니다 (스프링 내부에서 필요할 때가 있음)
 public class PostResponse {
 
-    // 2. 프론트엔드의 타입(Type) 선언과 이름, 자료형을 똑같이 맞춘다.
-    private String id;           // 글 번호 (프론트에서 string으로 원해서 String 처리한다)
-    private String category;     // "게임" 또는 "공부"
+    private String id;           // 문자로 변환된 글 번호
+    private String category;     // "게임", "공부", "운동" 등
     private String title;        // 제목
-    private String description;  // 본문 (엔티티의 content 역할)
-    private String author;       // 작성자 별명
+    private String description;  // 상세 설명
+    private String author;       // 작성자 닉네임
     private String authorTier;   // 작성자 티어
     private int currentMembers;  // 현재 인원
     private int maxMembers;      // 최대 인원
     private String targetScore;  // 목표 점수/티어
-    private String createdAt;    // 작성일 ("2026.05.06" 형태의 문자열)
+    private String createdAt;    // 날짜 문자열 (예: "2026.05.06")
     private String openChatLink; // 오픈채팅 링크
-    private String gameName;     // 게임 이름 (선택 사항)
-    private String studyName;    // 스터디 이름 (선택 사항)
+    private String gameName;     // 게임 이름 (선택)
+    private String studyName;    // 스터디 이름 (선택)
+
+    // 🔥 핵심: 엔티티(DB 내용)를 통째로 받아서 DTO 필드들에 쏙쏙 꽂아주는 생성자입니다.
+    public PostResponse(Post post) {
+        this.id = String.valueOf(post.getId()); // Long 타입을 프론트가 원하는 String으로 변환!
+        this.category = post.getCategory();
+        this.title = post.getTitle();
+        this.description = post.getDescription();
+        this.author = post.getAuthor();
+        this.authorTier = post.getAuthorTier();
+        this.currentMembers = post.getCurrentMembers();
+        this.maxMembers = post.getMaxMembers();
+        this.targetScore = post.getTargetScore();
+        this.openChatLink = post.getOpenChatLink();
+        this.gameName = post.getGameName();
+        this.studyName = post.getStudyName();
+
+        // LocalDateTime 날짜 객체를 프론트가 원하는 "yyyy.MM.dd" 형식의 문자로 변환!
+        if (post.getCreatedAt() != null) {
+            this.createdAt = post.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+        }
+    }
 }

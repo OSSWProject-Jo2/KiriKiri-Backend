@@ -1,6 +1,10 @@
 package com.example.party_finder.domain;
-import org.springframework.data.jpa.repository.JpaRepository;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository // 스프링에게 이 인터페이스가 DB 담당 비서임을 알립니다.
 public interface PostRepository extends JpaRepository<Post, Long> {
-        // 이제 .save(), .findAll() 같은 메서드를 바로 쓸 수 있습니다.
+    // JpaRepository<엔티티타입, PK타입>을 상속받으면
+    // 우리가 SQL을 짜지 않아도 save(), findAll(), findById()를 자동으로 쓸 수 있게 됩니다.
 }
