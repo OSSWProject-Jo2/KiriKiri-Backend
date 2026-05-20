@@ -17,7 +17,14 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY) // 번호 자동 증가 (1, 2, 3...)
     private Long id; // 게시글의 고유 번호
 
+    // ---  카테고리 (필터링용) ---
     @Column(nullable = false) // DB 칸을 만들 때 '비어있으면 안 됨(NOT NULL)' 규칙 적용
+    private String boardType;   // "GAME" 또는 "STUDY" (전체 탭 분류용)
+
+    @Column(nullable = false)
+    private String categoryTag; // 예: "리그 오브 레전드", "정보처리기사", "발로란트"
+
+    @Column(nullable = false)
     private String title; // 게시글 제목
 
     @Column(columnDefinition = "TEXT", nullable = false) // 일반 글자 칸보다 훨씬 큰 'TEXT' 타입으로 지정
@@ -31,7 +38,41 @@ public class Post {
     @Column(nullable = false) // 비밀번호 없으면 나중에 수정/삭제 못 함
     private String password; // 수정 및 삭제를 위한 비밀번호
 
+    // --- 프론트엔드 맞춤 추가 정보 (단순 문자열/숫자로 타협) ---
+    @Column(nullable = false)
+    private int currentPeople;  // 현재 인원 (예: 3)
+
+    @Column(nullable = false)
+    private int maxPeople;      // 최대 인원 (예: 5)
+
+    @Column(nullable = false)
+    private String authorTier;  // 작성자 티어 (예: "골드 2")
+
+    @Column(nullable = false)
+    private String targetGoal;  // 목표 (예: "플래티넘", "실기 합격", "미정")
+
+    @Column(nullable = false)
+    private String openChatLink;// 오픈채팅 링크 (단순 텍스트 저장)
+
     @CreatedDate // 데이터가 처음 저장될 때 현재 시간을 자동으로 꽂아줌
     @Column(updatable = false) // 글을 수정한다고 해서 작성 시간이 바뀌면 안 되므로 '수정 불가' 설정
     private LocalDateTime createdAt; // 글 쓴 시간
+
+
+    //모집 여부 필드
+    @Enumerated(EnumType.STRING) // DB에 숫자가 아닌 "RECRUITING" 문자열 그대로 저장함
+    @Column(nullable = false)
+    private PostStatus status = PostStatus.RECRUITING; // 기본값은 '모집 중'
+
+    /*
+     * [핵심 로직] 인원수가 변경될 때 상태를 자동으로 업데이트하는 메서드
+     * 서비스 계층에서 currentPeople을 수정할 때 이 메서드를 호출해주면 좋습니다.
+     */
+    public void updateStatusByPeople() {
+        if (this.currentPeople >= this.maxPeople) {
+            this.status = PostStatus.CLOSED;
+        } else {
+            this.status = PostStatus.RECRUITING;
+        }
+    }
 }
