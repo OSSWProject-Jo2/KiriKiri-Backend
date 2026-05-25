@@ -62,5 +62,15 @@ public class PostController {
         postService.delete(id, userId);
     }
 
+    // 게시글 수정
+    // PUT /api/posts/{id} 요청이 오면 토큰에서 userId 꺼내서 본인 확인 후 수정
+    @PutMapping("/{id}")
+    public PostResponse update(@PathVariable Long id,
+                               @RequestBody PostRequest request,
+                               @AuthenticationPrincipal Jwt jwt) {
+        String userId = jwt.getSubject();
+        return postService.update(id, request, userId);
+    }
+
 }
 

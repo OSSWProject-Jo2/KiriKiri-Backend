@@ -61,4 +61,29 @@ public class PostService {
         postRepository.delete(post); // DB에서 삭제
     }
 
+    // 게시글 수정 (userId로 본인 확인 후 수정)
+    public PostResponse update(Long id, PostRequest request, String userId) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+
+        // 본인 게시글인지 확인
+        if (!post.getUserId().equals(userId)) {
+            throw new RuntimeException("수정 권한이 없습니다.");
+        }
+
+        // 수정할 내용 반영
+        post.setTitle(request.getTitle());
+        post.setCategory(request.getCategory());
+        post.setCategoryTag(request.getCategoryTag());
+        post.setDescription(request.getDescription());
+        post.setMaxMembers(request.getMaxMembers());
+        post.setTargetScore(request.getTargetScore());
+        post.setOpenChatLink(request.getOpenChatLink());
+        post.setGameName(request.getGameName());
+        post.setStudyName(request.getStudyName());
+
+        Post saved = postRepository.save(post); // 수정된 내용 DB에 저장
+        return new PostResponse(saved);
+    }
+
 }
