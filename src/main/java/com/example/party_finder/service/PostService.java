@@ -86,4 +86,13 @@ public class PostService {
         return new PostResponse(saved);
     }
 
+    // 키워드 검색 (제목, 분야, 모임명 중 하나라도 포함되면 결과에 포함)
+    public List<PostResponse> search(String keyword) {
+        return postRepository.findByTitleContainingOrCategoryContainingOrCategoryTagContaining(
+                        keyword, keyword, keyword)
+                .stream()
+                .map(PostResponse::new)
+                .collect(Collectors.toList());
+    }
+
 }

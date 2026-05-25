@@ -13,7 +13,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/posts")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*") // 프론트엔드 연동을 위해 CORS 허용
 public class PostController {
 
     private final PostService postService;
@@ -47,7 +46,6 @@ public class PostController {
         return postService.getByCategory(category);
 
         /*
-        GET /api/posts                → 전체
         GET /api/posts/category/게임  → 게임만
         GET /api/posts/category/공부  → 공부만
         GET /api/posts/category/운동  → 운동만
@@ -72,5 +70,21 @@ public class PostController {
         return postService.update(id, request, userId);
     }
 
+    // 키워드 검색
+    // GET /api/posts/search?keyword=리그 → 제목, 분야, 모임명에 키워드 포함된 게시글 반환
+    @GetMapping("/search")
+    public List<PostResponse> search(@RequestParam String keyword) {
+        return postService.search(keyword);
+    }
+
+    /* API 정리
+    GET    /api/posts                    → 전체 목록 조회
+    GET    /api/posts/{id}               → 단건 조회
+    POST   /api/posts                    → 게시글 등록 (로그인 필요)
+    PUT    /api/posts/{id}               → 게시글 수정 (본인만)
+    DELETE /api/posts/{id}               → 게시글 삭제 (본인만)
+    GET    /api/posts/category/{category} → 카테고리 필터링
+    GET    /api/posts/search?keyword={keyword} → 키워드 검색
+    */
 }
 
