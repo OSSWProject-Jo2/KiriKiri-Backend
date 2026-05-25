@@ -9,6 +9,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.http.HttpMethod;
 
 import java.util.List;
 
@@ -22,7 +23,8 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll() // 조회는 누구나
+                        .anyRequest().authenticated() // 등록/수정/삭제는 로그인 필요
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {}));
 
