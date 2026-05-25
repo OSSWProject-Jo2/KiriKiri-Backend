@@ -24,6 +24,7 @@ public class PostResponse {
     private String openChatLink; // 오픈채팅 링크
     private String gameName;     // 게임 이름 (선택)
     private String studyName;    // 스터디 이름 (선택)
+    private String userId; // 프론트엔드에 전달할 회원 식별 ID 추가
 
     // 🔥 핵심: 엔티티(DB 내용)를 통째로 받아서 DTO 필드들에 쏙쏙 꽂아주는 생성자입니다.
     public PostResponse(Post post) {
