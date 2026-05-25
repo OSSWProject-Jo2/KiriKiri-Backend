@@ -21,4 +21,5 @@ public class PostResponse {
     private String openChatLink; // 오픈채팅 링크
     private String gameName;     // 게임 이름 (선택 사항)
     private String studyName;    // 스터디 이름 (선택 사항)
+    private String userId; // 프론트엔드에 전달할 회원 식별 ID 추가
 }

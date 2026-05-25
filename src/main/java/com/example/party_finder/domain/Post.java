@@ -47,5 +47,7 @@ public class Post {
 
     private String studyName; // 스터디 이름 (선택 사항)
 
+    private String userId; // Clerk 회원 고유 식별 ID 추가
+
     private LocalDateTime createdAt = LocalDateTime.now(); // DB 저장 시 현재 시간 자동 기록
 }
