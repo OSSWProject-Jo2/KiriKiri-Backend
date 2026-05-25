@@ -47,4 +47,18 @@ public class PostService {
                 .map(PostResponse::new)
                 .collect(Collectors.toList());
     }
+
+    // 게시글 삭제 (userId로 본인 확인 후 삭제)
+    public void delete(Long id, String userId) {
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+
+        // 본인 게시글인지 확인
+        if (!post.getUserId().equals(userId)) {
+            throw new RuntimeException("삭제 권한이 없습니다.");
+        }
+
+        postRepository.delete(post); // DB에서 삭제
+    }
+
 }

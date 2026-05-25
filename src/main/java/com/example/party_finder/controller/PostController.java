@@ -53,5 +53,14 @@ public class PostController {
         GET /api/posts/category/운동  → 운동만
          */
     }
+    // 게시글 삭제
+    // DELETE /api/posts/{id} 요청이 오면 토큰에서 userId 꺼내서 본인 확인 후 삭제
+    @DeleteMapping("/{id}")
+    public void delete(@PathVariable Long id,
+                       @AuthenticationPrincipal Jwt jwt) {
+        String userId = jwt.getSubject();
+        postService.delete(id, userId);
+    }
+
 }
 
