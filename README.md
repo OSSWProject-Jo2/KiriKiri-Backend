@@ -12,14 +12,25 @@
 - **Frontend** : React (별도 레포지토리)
 
 ## 프로젝트 구조
-src/main/java/com/example/party_finder
-├── config          # SecurityConfig (CORS, JWT 설정)
-├── controller      # PostController (REST API 엔드포인트)
-├── domain          # Post 엔티티, PostRepository
-├── dto             # PostRequest, PostResponse
-├── service         # PostService (비즈니스 로직)
-├── DataInitializer # 서버 시작 시 테스트 데이터 자동 삽입
-└── PartyFinderApplication
+
+```
+src/main/java/com/example/party_finder/
+├── config/
+│   └── SecurityConfig.java
+├── controller/
+│   └── PostController.java
+├── domain/
+│   ├── Post.java
+│   └── PostRepository.java
+├── dto/
+│   ├── PostRequest.java
+│   └── PostResponse.java
+├── service/
+│   └── PostService.java
+├── DataInitializer.java
+├── MainController.java
+└── PartyFinderApplication.java
+```
 
 ## 주요 기능
 - 게시글 등록 / 수정 / 삭제 (Clerk 로그인 후 본인 글만 가능)
