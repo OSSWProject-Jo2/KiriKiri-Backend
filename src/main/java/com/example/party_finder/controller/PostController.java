@@ -33,4 +33,18 @@ public class PostController {
     public PostResponse getOne(@PathVariable Long id) {
         return postService.getOne(id);
     }
+
+    // 카테고리 필터링 조회
+    @GetMapping("/category/{category}")
+    public List<PostResponse> getByCategory(@PathVariable String category) {
+        return postService.getByCategory(category);
+
+        /*
+        GET /api/posts                → 전체
+        GET /api/posts/category/게임  → 게임만
+        GET /api/posts/category/공부  → 공부만
+        GET /api/posts/category/운동  → 운동만
+         */
+    }
 }
+

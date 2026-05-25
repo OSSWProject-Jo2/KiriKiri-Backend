@@ -37,4 +37,12 @@ public class PostService {
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
         return new PostResponse(post);
     }
+
+    // 카테고리별 조회
+    public List<PostResponse> getByCategory(String category) {
+        return postRepository.findByCategory(category)
+                .stream()
+                .map(PostResponse::new)
+                .collect(Collectors.toList());
+    }
 }
