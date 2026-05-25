@@ -40,6 +40,7 @@ public class PostResponse {
         this.openChatLink = post.getOpenChatLink();
         this.gameName = post.getGameName();
         this.studyName = post.getStudyName();
+        this.userId = post.getUserId(); // Clerk 사용자 ID를 응답에 포함
 
         // LocalDateTime 날짜 객체를 프론트가 원하는 "yyyy.MM.dd" 형식의 문자로 변환!
         if (post.getCreatedAt() != null) {

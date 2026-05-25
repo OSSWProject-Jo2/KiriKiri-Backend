@@ -17,10 +17,12 @@ public class PostService {
     private final PostRepository postRepository;
 
     // 게시글 등록
-    public PostResponse create(PostRequest request) {
-        Post post = request.toEntity();
-        Post saved = postRepository.save(post);
-        return new PostResponse(saved);
+// PostController에서 넘겨받은 userId(Clerk 사용자 ID)를 게시글에 저장
+    public PostResponse create(PostRequest request, String userId) {
+        Post post = request.toEntity(); // 요청 DTO를 엔티티로 변환
+        post.setUserId(userId); // 토큰에서 꺼낸 Clerk 사용자 ID 저장
+        Post saved = postRepository.save(post); // DB에 저장
+        return new PostResponse(saved); // 저장된 엔티티를 응답 DTO로 변환해서 반환
     }
 
     // 전체 목록 조회
