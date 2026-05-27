@@ -3,12 +3,11 @@ package com.example.party_finder.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 
 @Entity // 이 클래스는 DB의 테이블과 1:1로 매핑되는 '엔티티'임을 선언
 @Getter @Setter // 필드에 대한 Getter/Setter를 자동으로 생성
-@EntityListeners(AuditingEntityListener.class) // DB에 저장될 때 "시간 기록" 이벤트를 감지함
+
 public class Post {
 
     @Id // 이 필드를 테이블의 기본키로 지정
