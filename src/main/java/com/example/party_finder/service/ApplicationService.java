@@ -18,8 +18,8 @@ public class ApplicationService {
     private final ApplicationRepository applicationRepository;
     private final PostRepository postRepository;
 
-    // 참여 신청
-    public void apply(Long postId, String applicantId, String nickname) {
+    // 참여 신청 - 성공 시 오픈채팅 링크 반환 (프론트 JoinResponse 타입과 일치)
+    public String apply(Long postId, String applicantId, String nickname) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
 
@@ -45,6 +45,9 @@ public class ApplicationService {
         application.setStatus("PENDING"); // 기본 상태: 대기중
 
         applicationRepository.save(application);
+
+        // 수락 전이므로 오픈채팅 링크는 아직 비공개 (수락 후 공개)
+        return null;
     }
 
     // 신청자 목록 조회 (게시글 작성자만 가능)
