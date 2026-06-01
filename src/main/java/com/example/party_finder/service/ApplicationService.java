@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -20,7 +21,7 @@ public class ApplicationService {
     // 참여 신청
     public void apply(Long postId, String applicantId, String nickname) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
 
         // 본인 게시글에는 신청 불가
         if (post.getUserId() != null && post.getUserId().equals(applicantId)) {
@@ -49,7 +50,7 @@ public class ApplicationService {
     // 신청자 목록 조회 (게시글 작성자만 가능)
     public List<Application> getApplicants(Long postId, String userId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
 
         // 게시글 작성자인지 확인
         if (post.getUserId() == null || !post.getUserId().equals(userId)) {
@@ -63,7 +64,7 @@ public class ApplicationService {
     @Transactional
     public void accept(Long postId, Long applicationId, String userId) {
         Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
 
         // 게시글 작성자인지 확인
         if (post.getUserId() == null || !post.getUserId().equals(userId)) {
@@ -76,7 +77,7 @@ public class ApplicationService {
         }
 
         Application application = applicationRepository.findById(applicationId)
-                .orElseThrow(() -> new RuntimeException("신청을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("신청을 찾을 수 없습니다."));
 
         if ("ACCEPTED".equals(application.getStatus())) {
             throw new RuntimeException("이미 수락된 신청입니다.");

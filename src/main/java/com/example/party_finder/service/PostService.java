@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,7 +37,7 @@ public class PostService {
     // 단건 조회
     public PostResponse getOne(Long id) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
         return new PostResponse(post);
     }
 
@@ -52,7 +53,7 @@ public class PostService {
     public void delete(Long id, String userId) {
 
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
 
 
 
@@ -68,7 +69,7 @@ public class PostService {
     // 게시글 수정 (userId로 본인 확인 후 수정)
     public PostResponse update(Long id, PostRequest request, String userId) {
         Post post = postRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
 
         // 본인 게시글인지 확인
         if (post.getUserId() == null || !post.getUserId().equals(userId)) {
