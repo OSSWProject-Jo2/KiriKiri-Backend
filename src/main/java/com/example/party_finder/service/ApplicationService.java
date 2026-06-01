@@ -6,6 +6,7 @@ import com.example.party_finder.domain.Post;
 import com.example.party_finder.domain.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,6 +25,11 @@ public class ApplicationService {
         // 본인 게시글에는 신청 불가
         if (post.getUserId() != null && post.getUserId().equals(applicantId)) {
             throw new RuntimeException("본인 게시글에는 신청할 수 없습니다.");
+        }
+
+        // 정원 마감 검사
+        if (post.getCurrentMembers() >= post.getMaxMembers()) {
+            throw new RuntimeException("정원이 마감되었습니다.");
         }
 
         // 중복 신청 방지
@@ -54,6 +60,7 @@ public class ApplicationService {
     }
 
     // 신청 수락
+    @Transactional
     public void accept(Long postId, Long applicationId, String userId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new RuntimeException("게시글을 찾을 수 없습니다."));
@@ -63,13 +70,21 @@ public class ApplicationService {
             throw new RuntimeException("수락 권한이 없습니다.");
         }
 
+        // 정원 재확인 (트랜잭션 내 최종 검증)
+        if (post.getCurrentMembers() >= post.getMaxMembers()) {
+            throw new RuntimeException("정원이 이미 마감되었습니다.");
+        }
+
         Application application = applicationRepository.findById(applicationId)
                 .orElseThrow(() -> new RuntimeException("신청을 찾을 수 없습니다."));
 
-        application.setStatus("ACCEPTED"); // 수락 처리
+        if ("ACCEPTED".equals(application.getStatus())) {
+            throw new RuntimeException("이미 수락된 신청입니다.");
+        }
+
+        application.setStatus("ACCEPTED");
         applicationRepository.save(application);
 
-        // 현재 인원 증가
         post.setCurrentMembers(post.getCurrentMembers() + 1);
         postRepository.save(post);
     }

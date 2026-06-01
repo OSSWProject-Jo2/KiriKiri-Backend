@@ -7,6 +7,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -40,11 +41,19 @@ public class ApplicationController {
     // 신청 수락
     // PATCH /api/posts/{postId}/applications/{applicationId}/accept
     @PatchMapping("/{postId}/applications/{applicationId}/accept")
-    public void accept(@PathVariable Long postId,
-                       @PathVariable Long applicationId,
-                       @AuthenticationPrincipal Jwt jwt) {
+    public Map<String, Object> accept(@PathVariable Long postId,
+                                      @PathVariable Long applicationId,
+                                      @AuthenticationPrincipal Jwt jwt) {
         String userId = jwt.getSubject();
-        applicationService.accept(postId, applicationId, userId);
+        Map<String, Object> response = new HashMap<>();
+        try {
+            applicationService.accept(postId, applicationId, userId);
+            response.put("success", true);
+        } catch (RuntimeException e) {
+            response.put("success", false);
+            response.put("error", e.getMessage());
+        }
+        return response;
     }
 }
 
