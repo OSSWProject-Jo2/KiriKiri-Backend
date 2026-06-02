@@ -3,19 +3,25 @@ package com.example.party_finder.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import java.time.LocalDateTime;
 
 @Entity // 이 클래스는 DB의 테이블과 1:1로 매핑되는 '엔티티'임을 선언
 @Getter @Setter // 필드에 대한 Getter/Setter를 자동으로 생성
-@EntityListeners(AuditingEntityListener.class) // DB에 저장될 때 "시간 기록" 이벤트를 감지함
+
 public class Post {
 
     @Id // 이 필드를 테이블의 기본키로 지정
     @GeneratedValue(strategy = GenerationType.IDENTITY) // 번호 자동 증가 (1, 2, 3...)
     private Long id; // 게시글의 고유 번호
 
+    // ---  카테고리 (필터링용) ---
     @Column(nullable = false) // DB 칸을 만들 때 '비어있으면 안 됨(NOT NULL)' 규칙 적용
+    private String boardType;   // "GAME" 또는 "STUDY" (전체 탭 분류용)
+
+    @Column(nullable = false)
+    private String categoryTag; // 예: "리그 오브 레전드", "정보처리기사", "발로란트"
+
+    @Column(nullable = false)
     private String title; // 게시글 제목
 
     // 프론트엔드 명칭에 맞춰서 content를 description으로 변경한다.
