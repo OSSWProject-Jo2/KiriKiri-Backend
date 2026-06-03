@@ -27,8 +27,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/posts/*/applications").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/posts/*/applications/me").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
-                        // 알림 API는 로그인 필요 (JWT로 본인 확인)
-                        .requestMatchers("/api/notifications/**").authenticated()
+                        // 알림 API는 누구나 접근 가능 (닉네임 기반 조회, MVP 타협)
+                        .requestMatchers("/api/notifications/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt -> {}));
