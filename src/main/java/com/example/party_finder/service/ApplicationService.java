@@ -2,6 +2,8 @@ package com.example.party_finder.service;
 
 import com.example.party_finder.domain.Application;
 import com.example.party_finder.domain.ApplicationRepository;
+import com.example.party_finder.domain.Notification;
+import com.example.party_finder.domain.NotificationRepository;
 import com.example.party_finder.domain.Post;
 import com.example.party_finder.domain.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,23 +19,19 @@ public class ApplicationService {
 
     private final ApplicationRepository applicationRepository;
     private final PostRepository postRepository;
+    private final NotificationRepository notificationRepository; // 알림 DB 연결
 
-    // 참여 신청 - 성공 시 오픈채팅 링크 반환 (프론트 JoinResponse 타입과 일치)
+    // 참여 신청
     public String apply(Long postId, String applicantId, String nickname) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
 
-        // 본인 게시글에는 신청 불가
         if (post.getUserId() != null && post.getUserId().equals(applicantId)) {
             throw new RuntimeException("본인 게시글에는 신청할 수 없습니다.");
         }
-
-        // 정원 마감 검사
         if (post.getCurrentMembers() >= post.getMaxMembers()) {
             throw new RuntimeException("정원이 마감되었습니다.");
         }
-
-        // 중복 신청 방지
         if (applicationRepository.existsByPostAndApplicantId(post, applicantId)) {
             throw new RuntimeException("이미 신청한 게시글입니다.");
         }
@@ -42,24 +40,32 @@ public class ApplicationService {
         application.setPost(post);
         application.setApplicantId(applicantId);
         application.setNickname(nickname);
-        application.setStatus("PENDING"); // 기본 상태: 대기중
+        application.setStatus("PENDING");
 
         applicationRepository.save(application);
 
-        // 신청 즉시 오픈채팅 링크 반환 (MVP 타협안: 수락 전 공개)
+        // 🚨 [추가된 로직] 방장에게 '신청 도착' 알림 저장
+        notificationRepository.save(Notification.builder()
+                .kind("application")
+                .postId(post.getId())
+                .postTitle(post.getTitle())
+                .recipientNickname(post.getAuthor()) // 방장 닉네임 (Post 엔티티에 author 필드가 있다고 가정)
+                .actorNickname(nickname)             // 신청자 닉네임
+                .message(nickname + "님이 참여를 신청했습니다.")
+                .openChatLink(null)
+                .build());
+
         return post.getOpenChatLink();
     }
 
-    // 신청자 목록 조회 (게시글 작성자만 가능)
+    // 신청자 목록 조회
     public List<Application> getApplicants(Long postId, String userId) {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
 
-        // 게시글 작성자인지 확인
         if (post.getUserId() == null || !post.getUserId().equals(userId)) {
             throw new RuntimeException("조회 권한이 없습니다.");
         }
-
         return applicationRepository.findByPost(post);
     }
 
@@ -69,12 +75,9 @@ public class ApplicationService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
 
-        // 게시글 작성자인지 확인
         if (post.getUserId() == null || !post.getUserId().equals(userId)) {
             throw new RuntimeException("수락 권한이 없습니다.");
         }
-
-        // 정원 재확인 (트랜잭션 내 최종 검증)
         if (post.getCurrentMembers() >= post.getMaxMembers()) {
             throw new RuntimeException("정원이 이미 마감되었습니다.");
         }
@@ -91,5 +94,16 @@ public class ApplicationService {
 
         post.setCurrentMembers(post.getCurrentMembers() + 1);
         postRepository.save(post);
+
+        // 🚨 [추가된 로직] 신청자에게 '수락 완료' 알림 저장 및 카톡 링크 전달
+        notificationRepository.save(Notification.builder()
+                .kind("accepted")
+                .postId(post.getId())
+                .postTitle(post.getTitle())
+                .recipientNickname(application.getNickname()) // 신청자 닉네임
+                .actorNickname(post.getAuthor())              // 방장 닉네임
+                .message(post.getTitle() + " 모임에 수락되었습니다!")
+                .openChatLink(post.getOpenChatLink())
+                .build());
     }
 }

@@ -1,5 +1,9 @@
 package com.example.party_finder.service;
 
+import com.example.party_finder.domain.Application;
+import com.example.party_finder.domain.ApplicationRepository;
+import com.example.party_finder.domain.Notification;
+import com.example.party_finder.domain.NotificationRepository;
 import com.example.party_finder.domain.Post;
 import com.example.party_finder.dto.PostRequest;
 import com.example.party_finder.dto.PostResponse;
@@ -16,67 +20,63 @@ import java.util.stream.Collectors;
 public class PostService {
 
     private final PostRepository postRepository;
+    private final ApplicationRepository applicationRepository; // 추가
+    private final NotificationRepository notificationRepository; // 추가
 
-    // 게시글 등록
-// PostController에서 넘겨받은 userId(Clerk 사용자 ID)를 게시글에 저장
     public PostResponse create(PostRequest request, String userId) {
-        Post post = request.toEntity(); // 요청 DTO를 엔티티로 변환
-        post.setUserId(userId); // 토큰에서 꺼낸 Clerk 사용자 ID 저장
-        Post saved = postRepository.save(post); // DB에 저장
-        return new PostResponse(saved); // 저장된 엔티티를 응답 DTO로 변환해서 반환
+        Post post = request.toEntity();
+        post.setUserId(userId);
+        Post saved = postRepository.save(post);
+        return new PostResponse(saved);
     }
 
-    // 전체 목록 조회
     public List<PostResponse> getAll() {
-        return postRepository.findAll()
-                .stream()
-                .map(PostResponse::new)
-                .collect(Collectors.toList());
+        return postRepository.findAll().stream().map(PostResponse::new).collect(Collectors.toList());
     }
 
-    // 단건 조회
     public PostResponse getOne(Long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
         return new PostResponse(post);
     }
 
-    // 카테고리별 조회
     public List<PostResponse> getByCategory(String category) {
-        return postRepository.findByCategory(category)
-                .stream()
-                .map(PostResponse::new)
-                .collect(Collectors.toList());
+        return postRepository.findByCategory(category).stream().map(PostResponse::new).collect(Collectors.toList());
     }
 
-    // 게시글 삭제 (userId로 본인 확인 후 삭제)
     public void delete(Long id, String userId) {
-
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
 
-
-
-        // 본인 게시글인지 확인
         if (post.getUserId() == null || !post.getUserId().equals(userId)) {
             throw new RuntimeException("삭제 권한이 없습니다.");
         }
 
+        // 🚨 [추가된 로직] 삭제 전, 신청자들에게 '게시글 삭제됨' 알림 일괄 저장
+        List<Application> applications = applicationRepository.findByPost(post);
+        for (Application app : applications) {
+            notificationRepository.save(Notification.builder()
+                    .kind("deleted")
+                    .postId(post.getId())
+                    .postTitle(post.getTitle())
+                    .recipientNickname(app.getNickname())
+                    .actorNickname(post.getAuthor())
+                    .message(post.getTitle() + " 모임이 삭제되었습니다.")
+                    .openChatLink(null)
+                    .build());
+        }
 
-        postRepository.delete(post); // DB에서 삭제
+        postRepository.delete(post);
     }
 
-    // 게시글 수정 (userId로 본인 확인 후 수정)
     public PostResponse update(Long id, PostRequest request, String userId) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
 
-        // 본인 게시글인지 확인
         if (post.getUserId() == null || !post.getUserId().equals(userId)) {
             throw new RuntimeException("수정 권한이 없습니다.");
         }
 
-        // 수정할 내용 반영
         post.setTitle(request.getTitle());
         post.setCategory(request.getCategory());
         post.setCategoryTag(request.getCategoryTag());
@@ -87,17 +87,13 @@ public class PostService {
         post.setGameName(request.getGameName());
         post.setStudyName(request.getStudyName());
 
-        Post saved = postRepository.save(post); // 수정된 내용 DB에 저장
+        Post saved = postRepository.save(post);
         return new PostResponse(saved);
     }
 
-    // 키워드 검색 (제목, 분야, 모임명 중 하나라도 포함되면 결과에 포함)
     public List<PostResponse> search(String keyword) {
         return postRepository.findByTitleContainingOrCategoryContainingOrCategoryTagContaining(
                         keyword, keyword, keyword)
-                .stream()
-                .map(PostResponse::new)
-                .collect(Collectors.toList());
+                .stream().map(PostResponse::new).collect(Collectors.toList());
     }
-
 }
