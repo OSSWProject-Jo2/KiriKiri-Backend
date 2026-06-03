@@ -1,6 +1,7 @@
 package com.example.party_finder.controller;
 
 import com.example.party_finder.dto.ApplicationResponse;
+import com.example.party_finder.dto.MyApplicationResponse;
 import com.example.party_finder.service.ApplicationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -50,6 +51,15 @@ public class ApplicationController {
                 .stream()
                 .map(ApplicationResponse::new)
                 .collect(Collectors.toList());
+    }
+
+    // 내 신청 상태 조회 - 수락됐을 때만 오픈채팅 링크 반환 (프론트 "신청 후 공개" 섹션용)
+    // GET /api/posts/{postId}/applications/me
+    @GetMapping("/{postId}/applications/me")
+    public MyApplicationResponse getMyApplication(@PathVariable Long postId,
+                                                  @AuthenticationPrincipal Jwt jwt) {
+        String applicantId = jwt.getSubject();
+        return new MyApplicationResponse(applicationService.getMyApplication(postId, applicantId));
     }
 
     // 신청 수락
