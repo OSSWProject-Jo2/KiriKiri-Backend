@@ -2,6 +2,8 @@ package com.example.party_finder.service;
 
 import com.example.party_finder.domain.Application;
 import com.example.party_finder.domain.ApplicationRepository;
+import com.example.party_finder.domain.Notification;
+import com.example.party_finder.domain.NotificationRepository;
 import com.example.party_finder.domain.Post;
 import com.example.party_finder.domain.PostRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ public class ApplicationService {
 
     private final ApplicationRepository applicationRepository;
     private final PostRepository postRepository;
+    private final NotificationRepository notificationRepository; // 알림 저장용
 
     // 참여 신청 - 성공 시 오픈채팅 링크 반환 (프론트 JoinResponse 타입과 일치)
     public String apply(Long postId, String applicantId, String nickname) {
@@ -46,6 +49,17 @@ public class ApplicationService {
         application.setStatus("PENDING"); // 기본 상태: 대기중
 
         applicationRepository.save(application);
+
+        // 방장에게 '신청 도착' 알림 저장
+        notificationRepository.save(Notification.builder()
+                .kind("application")
+                .postId(post.getId())
+                .postTitle(post.getTitle())
+                .recipientNickname(post.getAuthor()) // 알림 받는 사람: 방장
+                .actorNickname(nickname)             // 알림 유발자: 신청자
+                .message(nickname + "님이 참여를 신청했습니다.")
+                .openChatLink(null)
+                .build());
 
         // 수락 전이므로 링크 미공개 - 수락 후 /my-application API로 확인 가능
         return null;
@@ -101,5 +115,16 @@ public class ApplicationService {
 
         post.setCurrentMembers(post.getCurrentMembers() + 1);
         postRepository.save(post);
+
+        // 신청자에게 '수락 완료' 알림 저장 (오픈채팅 링크 포함)
+        notificationRepository.save(Notification.builder()
+                .kind("accepted")
+                .postId(post.getId())
+                .postTitle(post.getTitle())
+                .recipientNickname(application.getNickname()) // 알림 받는 사람: 신청자
+                .actorNickname(post.getAuthor())              // 알림 유발자: 방장
+                .message(post.getTitle() + " 모임에 수락되었습니다!")
+                .openChatLink(post.getOpenChatLink())
+                .build());
     }
 }
