@@ -23,7 +23,9 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/api/posts/{postId}/applications").authenticated()
+                        // 신청자 목록 및 내 신청 상태 조회는 로그인 필요
+                        .requestMatchers(HttpMethod.GET, "/api/posts/*/applications").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/posts/*/applications/me").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/posts/**").permitAll()
                         .anyRequest().authenticated()
                 )

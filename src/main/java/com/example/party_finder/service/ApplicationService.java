@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -46,8 +47,17 @@ public class ApplicationService {
 
         applicationRepository.save(application);
 
-        // 신청 즉시 오픈채팅 링크 반환 (MVP 타협안: 수락 전 공개)
-        return post.getOpenChatLink();
+        // 수락 전이므로 링크 미공개 - 수락 후 /my-application API로 확인 가능
+        return null;
+    }
+
+    // 내 신청 상태 조회 - 수락됐을 때만 오픈채팅 링크 반환
+    public Application getMyApplication(Long postId, String applicantId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NoSuchElementException("게시글을 찾을 수 없습니다."));
+
+        return applicationRepository.findByPostAndApplicantId(post, applicantId)
+                .orElseThrow(() -> new NoSuchElementException("신청 내역이 없습니다."));
     }
 
     // 신청자 목록 조회 (게시글 작성자만 가능)
