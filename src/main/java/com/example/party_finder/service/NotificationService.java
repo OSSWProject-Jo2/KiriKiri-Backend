@@ -25,13 +25,10 @@ public class NotificationService {
                 .collect(Collectors.toList());
     }
 
-    // 2. 프론트가 빨간 점(안 읽은 알림 갯수) 띄울 때 쓸 기능
+    // 2. 프론트가 빨간 점(안 읽은 알림 갯수) 띄울 때 쓸 기능 - DB count 쿼리로 직접 집계
     @Transactional(readOnly = true)
     public long getUnreadCount(String nickname) {
-        return notificationRepository.findByRecipientNicknameOrderByCreatedAtDesc(nickname)
-                .stream()
-                .filter(n -> !n.isRead())
-                .count();
+        return notificationRepository.countByRecipientNicknameAndIsRead(nickname, false);
     }
 
     // 3. 알림 탭 열었을 때 전부 '읽음'으로 바꾸는 기능
