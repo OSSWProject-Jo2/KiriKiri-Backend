@@ -2,6 +2,7 @@ package com.example.party_finder.dto;
 
 import com.example.party_finder.domain.Notification;
 import lombok.Getter;
+
 import java.time.format.DateTimeFormatter;
 
 @Getter

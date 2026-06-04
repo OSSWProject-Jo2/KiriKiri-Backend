@@ -1,18 +1,12 @@
 package com.example.party_finder.service;
 
-import com.example.party_finder.domain.Application;
-import com.example.party_finder.domain.ApplicationRepository;
-import com.example.party_finder.domain.Notification;
-import com.example.party_finder.domain.NotificationRepository;
-import com.example.party_finder.domain.Post;
-import com.example.party_finder.domain.PostRepository;
+import com.example.party_finder.domain.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

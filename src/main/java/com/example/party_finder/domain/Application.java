@@ -3,10 +3,12 @@ package com.example.party_finder.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Entity
-@Getter @Setter
+@Getter
+@Setter
 public class Application {
 
     @Id

@@ -2,8 +2,8 @@ package com.example.party_finder.dto;
 
 import com.example.party_finder.domain.Post;
 import lombok.Getter;
-import lombok.Setter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
 @Setter

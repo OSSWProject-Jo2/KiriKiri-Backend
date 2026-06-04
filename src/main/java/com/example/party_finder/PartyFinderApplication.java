@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @SpringBootApplication
 public class PartyFinderApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(PartyFinderApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(PartyFinderApplication.class, args);
+    }
 
 }

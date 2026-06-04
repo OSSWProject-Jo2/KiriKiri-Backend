@@ -3,10 +3,12 @@ package com.example.party_finder.domain;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Entity // 이 클래스는 DB의 테이블과 1:1로 매핑되는 '엔티티'임을 선언
-@Getter @Setter // 필드에 대한 Getter/Setter를 자동으로 생성
+@Getter
+@Setter // 필드에 대한 Getter/Setter를 자동으로 생성
 
 public class Post {
 

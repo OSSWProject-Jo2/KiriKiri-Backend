@@ -4,9 +4,9 @@ import com.example.party_finder.dto.PostRequest;
 import com.example.party_finder.dto.PostResponse;
 import com.example.party_finder.service.PostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -51,6 +51,7 @@ public class PostController {
         GET /api/posts/category/운동  → 운동만
          */
     }
+
     // 게시글 삭제
     // DELETE /api/posts/{id} 요청이 오면 토큰에서 userId 꺼내서 본인 확인 후 삭제
     @DeleteMapping("/{id}")

@@ -2,6 +2,7 @@ package com.example.party_finder.domain;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
 import java.util.List;
 
 @Repository // 스프링에게 이 인터페이스가 DB 담당 비서임을 알립니다.
