@@ -2,10 +2,12 @@
 
 > 함께할 사람을 찾는 파티 모집 서비스
 
+
 ## 프로젝트 소개
 
 게임, 공부, 운동 등 다양한 분야에서 함께할 파티원을 모집할 수 있는 웹 서비스입니다.
 비회원도 게시글을 열람할 수 있으며, Clerk 로그인 후 게시글 작성 및 수정/삭제, 파티 참여 신청이 가능합니다.
+
 
 ## 기술 스택
 
@@ -13,6 +15,7 @@
 - **Database** : MySQL 8.0
 - **Auth** : Clerk (JWT 기반 인증)
 - **Frontend** : Next.js (별도 레포지토리)
+
 
 ## 프로젝트 구조
 
@@ -47,6 +50,7 @@ src/main/java/com/example/party_finder/
 └── PartyFinderApplication.java
 ```
 
+
 ## 주요 기능
 
 - 게시글 등록 / 수정 / 삭제 (Clerk 로그인 후 본인 글만 가능)
@@ -59,6 +63,7 @@ src/main/java/com/example/party_finder/
 - 알림 기능 (신청 도착 → 방장 알림 / 수락 완료 → 신청자 알림)
 - Clerk JWT 토큰 기반 사용자 인증
 - 비회원 게시글 열람 가능
+
 
 ## API 목록
 
@@ -74,6 +79,7 @@ src/main/java/com/example/party_finder/
 | PUT    | /api/posts/{id}                     | 게시글 수정   | ✅     |
 | DELETE | /api/posts/{id}                     | 게시글 삭제   | ✅     |
 
+
 ### 참여 신청
 
 | Method | URL                                          | 설명               | 인증 필요 |
@@ -83,6 +89,7 @@ src/main/java/com/example/party_finder/
 | GET    | /api/posts/{postId}/applications/me          | 내 신청 상태 조회       | ✅     |
 | PATCH  | /api/posts/{postId}/applications/{id}/accept | 신청 수락            | ✅     |
 
+
 ### 알림
 
 | Method | URL                                                 | 설명       | 인증 필요 |
@@ -91,12 +98,14 @@ src/main/java/com/example/party_finder/
 | GET    | /api/notifications/unread-count?nickname={nickname} | 안읽은 알림 수 | ❌     |
 | PATCH  | /api/notifications/read?nickname={nickname}         | 전체 읽음 처리 | ❌     |
 
+
 ## 로컬 실행 방법
 
 1. MySQL에 `party_db` 데이터베이스 생성
 2. `application.properties`에 DB 정보 입력
 3. IntelliJ에서 `PartyFinderApplication` 실행
 4. `http://localhost:8080/api/posts` 접속 확인
+
 
 ## 환경 설정 (application.properties)
 
@@ -107,6 +116,7 @@ spring.datasource.password=YOUR_PASSWORD
 spring.jpa.hibernate.ddl-auto=update
 spring.security.oauth2.resourceserver.jwt.jwk-set-uri=YOUR_CLERK_JWKS_URI
 ```
+
 
 ## 개발 현황
 
@@ -125,3 +135,14 @@ spring.security.oauth2.resourceserver.jwt.jwk-set-uri=YOUR_CLERK_JWKS_URI
 - [x] 알림 기능 (Notification 엔티티, 신청/수락 시 알림 저장, 게시글 삭제 시 기존 신청자에게 삭제 알림)
 - [x] 알림 API 프론트엔드 연동
 - [x] 유저 프로필 API (/users/me)
+
+
+## 시스템 아키텍처 및 DB 설계 (ERD)
+
+<img width="684" height="464" alt="ERD" src="https://github.com/user-attachments/assets/fef4bbc0-8e17-4385-83b2-75d89a19b0c1" />
+
+
+**데이터베이스 설계 핵심 포인트**
+* **핵심 도메인:** `post`, `application`, `notifications` 중심의 구조 설계
+* **데이터 정합성:** `Post`와 `Application` 간 1:N 외래키(FK) 매핑으로 무결성 확보
+* **논리적 참조:** DML이 잦은 알림 테이블은 FK를 해제하고 `post_id`로 유연하게 연동
