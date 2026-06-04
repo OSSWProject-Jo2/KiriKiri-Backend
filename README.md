@@ -112,6 +112,6 @@ spring.security.oauth2.resourceserver.jwt.jwk-set-uri=YOUR_CLERK_JWKS_URI
 - [x] 프론트엔드 API 응답 형태 일치 (ApplicationResponse DTO)
 - [x] 수락 후 오픈채팅 링크 공개 (MyApplicationResponse DTO)
 - [x] 게시글 삭제 시 신청 내역 함께 삭제 (외래키 오류 해결)
-- [x] 알림 기능 (Notification 엔티티, 신청/수락 시 알림 저장)
-- [ ] 알림 API 프론트엔드 연동
-- [ ] 유저 프로필 API (/users/me)
+- [x] 알림 기능 (Notification 엔티티, 신청/수락 시 알림 저장, 게시글 삭제 시 기존 신청자에게 삭제 알림)
+- [x] 알림 API 프론트엔드 연동
+- [x] 유저 프로필 API (/users/me)
